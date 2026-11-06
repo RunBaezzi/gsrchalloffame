@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A0A0B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>GSRC Hall of Fame</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0A0B; --card:#151517; --card2:#1C1C1F; --line:rgba(255,255,255,.07);
+  --t1:#F5F5F7; --t2:#9A9AA1; --t3:#5E5E66;
+  --acc:#F9B200; --acc-soft:rgba(249,178,0,.12);
+  --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
+  --sal:env(safe-area-inset-left,0px); --sar:env(safe-area-inset-right,0px);
+  --top:56px; --tab:64px; --rail:58px;
+  --num:"Inter",-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--t1)}
+body{font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",Pretendard,"Noto Sans KR",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;letter-spacing:-.01em;min-height:100dvh;overscroll-behavior-y:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.wrap{max-width:820px;margin:0 auto;padding-left:var(--sal);padding-right:var(--sar)}
+
+/* ── Top bar ── */
+.topbar{position:sticky;top:0;z-index:20;padding-top:var(--sat);
+  background:rgba(10,10,11,.78);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:1px solid transparent;transition:border-color .2s}
+.topbar.scrolled{border-bottom-color:var(--line)}
+.topbar .in{height:var(--top);display:flex;align-items:center;gap:8px;padding:0 18px}
+.topbar .seg{margin-left:auto}
+.logo{height:19px;width:auto;display:block}
+.seg{position:relative;display:flex;background:var(--card2);border-radius:10px;padding:3px}
+.seg button{position:relative;z-index:1;width:58px;height:30px;font-size:14px;font-weight:600;color:var(--t3);transition:color .2s}
+.seg button.on{color:var(--t1)}
+.seg .knob{position:absolute;top:3px;left:3px;width:58px;height:30px;border-radius:8px;background:#3A3A3F;
+  box-shadow:0 1px 3px rgba(0,0,0,.35);transition:transform .32s cubic-bezier(.3,.7,.2,1)}
+.seg.f .knob{transform:translateX(58px)}
+
+/* ── Title ── */
+.hero-title{padding:6px 18px 18px}
+.eyebrow{font-family:var(--num);font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--acc);text-transform:uppercase}
+.hero-title h1{font-family:var(--num);font-size:28px;line-height:1.1;font-weight:800;letter-spacing:-.035em;display:flex;align-items:baseline;gap:8px}
+.hero-title h1 span{font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;font-size:14px;font-weight:600;color:var(--t3);letter-spacing:-.01em}
+.hero-title p{font-size:15px;color:var(--t2);margin-top:6px;font-weight:500}
+
+/* ── Layout ── */
+.layout{display:grid;grid-template-columns:var(--rail) 1fr;align-items:start}
+.rail{position:sticky;top:calc(var(--sat) + var(--top) + 8px);display:flex;flex-direction:column;gap:2px;padding:0 0 0 8px;
+  max-height:calc(100dvh - var(--sat) - var(--top) - var(--tab) - var(--sab) - 24px);overflow-y:auto;scrollbar-width:none}
+.rail::-webkit-scrollbar{display:none}
+.rail button{height:38px;border-radius:10px;font-family:var(--num);font-size:13px;font-weight:600;color:var(--t3);
+  text-align:left;padding-left:9px;position:relative;transition:color .2s,background .2s}
+.rail button.ko{font-family:inherit;font-size:13px}
+.rail button.on{color:var(--t1);background:var(--card)}
+.rail button.on::before{content:"";position:absolute;left:0;top:12px;bottom:12px;width:2.5px;border-radius:3px;background:var(--t1)}
+.rail .div{height:1px;background:var(--line);margin:4px 6px}
+main{padding:0 16px calc(var(--tab) + var(--sab) + 32px) 10px;min-width:0}
+
+/* ── Section label ── */
+.label{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--t2);margin:0 4px 10px}
+.label .dot{width:6px;height:6px;border-radius:50%;background:var(--acc)}
+.label .r{margin-left:auto;font-weight:500;color:var(--t3);font-size:12px}
+
+/* ── Record card ── */
+.rec{position:relative;overflow:hidden;border-radius:22px;padding:20px 20px 18px;
+  background:radial-gradient(120% 90% at 100% 0%,rgba(249,178,0,.16) 0%,rgba(249,178,0,0) 55%),var(--card);
+  border:1px solid rgba(249,178,0,.18)}
+.rec .tag{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 9px;border-radius:7px;background:var(--acc-soft);
+  color:var(--acc);font-size:12px;font-weight:700}
+.rec .tag svg{width:12px;height:12px}
+.rec .time{font-family:var(--num);font-size:46px;font-weight:800;letter-spacing:-.04em;line-height:1;margin-top:16px;font-variant-numeric:tabular-nums}
+.rec .name{font-size:19px;font-weight:700;margin-top:12px}
+.rec .meta{font-size:13px;color:var(--t2);margin-top:4px;line-height:1.5}
+.rec .stats{display:grid;grid-template-columns:repeat(3,1fr);margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+.rec .stats div{min-width:0}
+.rec .stats b{display:block;font-family:var(--num);font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.rec .stats span{font-size:11.5px;color:var(--t3);font-weight:500}
+
+/* ── List ── */
+.sec{margin-top:28px}
+.list{background:var(--card);border-radius:18px;overflow:hidden}
+.row{display:flex;align-items:center;gap:12px;padding:14px 16px;position:relative}
+.row+.row::before{content:"";position:absolute;top:0;left:52px;right:0;height:1px;background:var(--line)}
+.rank{width:24px;flex:none;text-align:center;font-family:var(--num);font-size:16px;font-weight:700;color:var(--t3);font-variant-numeric:tabular-nums}
+.row.top .rank{color:var(--t1)}
+.row.r1 .rank{color:var(--acc)}
+.who{flex:1;min-width:0}
+.who .n{font-size:16px;font-weight:600;display:flex;align-items:center;gap:6px}
+.who .s{font-size:12.5px;color:var(--t2);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cr{font-family:var(--num);font-size:10px;font-weight:800;letter-spacing:.04em;color:#111;background:var(--acc);border-radius:5px;padding:2px 5px;line-height:1.2}
+.res{text-align:right;flex:none}
+.res .t{font-family:var(--num);font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}
+.res .p{font-family:var(--num);font-size:12px;color:var(--t3);margin-top:3px;font-variant-numeric:tabular-nums}
+.more{width:100%;height:48px;font-size:14px;font-weight:600;color:var(--t2);border-top:1px solid var(--line)}
+
+/* ── Timeline ── */
+.tl{background:var(--card);border-radius:18px;padding:6px 16px}
+.ev{display:grid;grid-template-columns:14px 1fr auto;gap:12px;align-items:center;padding:12px 0;position:relative}
+.ev .pin{width:9px;height:9px;border-radius:50%;background:var(--t3);margin:0 auto;position:relative;z-index:1}
+.ev:first-child .pin{background:var(--acc);box-shadow:0 0 0 4px var(--acc-soft)}
+.ev::before{content:"";position:absolute;left:6.5px;top:0;bottom:0;width:1px;background:var(--line)}
+.ev:first-child::before{top:50%}.ev:last-child::before{bottom:50%}
+.ev .d{font-size:14px;font-weight:600}
+.ev .d small{display:block;font-size:12px;color:var(--t2);font-weight:500;margin-top:2px}
+.ev .t{font-family:var(--num);font-size:15px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.ev .t small{display:block;font-size:11.5px;color:var(--acc);font-weight:600;margin-top:2px}
+
+.rec .co{font-size:12px;font-weight:700;color:var(--acc);vertical-align:middle}
+.rec .note{font-size:13.5px;color:var(--t1);opacity:.85;margin-top:10px;line-height:1.5}
+.foot{font-size:11.5px;color:var(--t3);text-align:center;margin-top:20px}
+.empty{padding:44px 20px;text-align:center;color:var(--t3);font-size:14px;background:var(--card);border-radius:18px}
+.sample{display:inline-block;margin-left:8px;font-size:11px;font-weight:600;color:var(--t2);background:var(--card2);padding:3px 7px;border-radius:6px;vertical-align:middle;letter-spacing:0}
+
+
+/* ── Podium ── */
+.podium{display:grid;grid-template-columns:1fr 1.15fr 1fr;align-items:end;gap:6px;margin-top:4px}
+.pd{display:flex;flex-direction:column;align-items:center;text-align:center;min-width:0}
+.pd .crtag{display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 7px;border-radius:6px;background:var(--acc-soft);font-size:10.5px;font-weight:800;color:var(--acc);margin-bottom:10px;white-space:nowrap}
+.pd .crtag svg{width:10px;height:10px}
+.medal{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-family:var(--num);font-weight:800;font-size:15px;color:rgba(40,25,0,.78);
+  background:var(--mg);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 0 0 1.5px rgba(255,255,255,.18),inset 0 -2px 4px rgba(0,0,0,.2);position:relative}
+.medal::after{content:"";position:absolute;inset:4px;border-radius:50%;border:1px solid rgba(255,255,255,.28)}
+.p1 .medal{width:48px;height:48px;font-size:19px;box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -2px 5px rgba(0,0,0,.2),0 8px 24px rgba(232,182,74,.22)}
+.g1{--mc:#E8B64A;--mg:linear-gradient(150deg,#FBE3A0 0%,#E8B64A 50%,#B78522 100%)}
+.g2{--mc:#BFC5CE;--mg:linear-gradient(150deg,#F1F3F6 0%,#BFC5CE 50%,#868D97 100%)}
+.g3{--mc:#C98A5E;--mg:linear-gradient(150deg,#F0C3A1 0%,#C98A5E 50%,#8D5331 100%)}
+.g2 .medal,.g3 .medal{color:rgba(20,20,20,.7)}
+.pd .pn{font-size:14px;font-weight:600;color:var(--t2);margin-top:10px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.p1 .pn{font-size:15px;color:var(--t1)}
+.pd .pt{font-family:var(--num);font-size:16px;font-weight:700;letter-spacing:-.03em;margin-top:2px;font-variant-numeric:tabular-nums}
+.p1 .pt{font-size:21px;font-weight:800}
+.pd .pp{font-family:var(--num);font-size:11px;color:var(--t3);margin-top:2px;font-variant-numeric:tabular-nums}
+.stand{width:100%;margin-top:12px;border-radius:12px 12px 0 0;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--mc) 13%,var(--card)),var(--bg));box-shadow:inset 0 1px 0 color-mix(in srgb,var(--mc) 45%,transparent)}
+.p1 .stand{height:72px}.p2 .stand{height:48px}.p3 .stand{height:34px}
+.pd.empty-slot{visibility:hidden}
+
+/* ── Pinned record (연도별 화면) ── */
+.pinrec{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:16px;margin-bottom:24px;background:var(--card)}
+.pinrec .ic{width:32px;height:32px;border-radius:50%;background:var(--acc-soft);color:var(--acc);display:grid;place-items:center;flex:none}
+.pinrec .ic svg{width:16px;height:16px}
+.pinrec .tx{flex:1;min-width:0}
+.pinrec .k{font-size:11.5px;font-weight:600;color:var(--t2)}
+.pinrec .v{font-size:15px;font-weight:700;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pinrec .v small{font-size:12px;color:var(--t2);font-weight:500;margin-left:4px}
+.pinrec .tm{font-family:var(--num);font-size:20px;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.boardhead{display:flex;align-items:flex-end;justify-content:space-between;margin:0 4px 20px}
+.boardhead h3{font-size:19px;font-weight:700;letter-spacing:-.03em}
+.boardhead>span{font-size:12px;color:var(--t3);font-weight:500;padding-bottom:2px}
+.boardhead .sub{display:block;font-size:12px;color:var(--t3);font-weight:600;margin-bottom:3px}
+.quote{font-size:13.5px;color:var(--t2);text-align:center;margin-top:18px;line-height:1.5}.quote span{color:var(--t3);font-size:12px}
+/* ── Bottom tab ── */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;padding-bottom:var(--sab);
+  background:rgba(12,12,14,.84);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);
+  border-top:1px solid var(--line)}
+.tabbar .in{max-width:820px;margin:0 auto;height:var(--tab);display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:9px 10px}
+.tabbar button{border-radius:12px;color:var(--t3);transition:color .2s,background .2s}
+.tabbar b{font-size:15px;font-weight:700;letter-spacing:-.02em}
+.tabbar button.on{color:var(--t1);background:var(--card2)}
+.tabbar button:active{transform:scale(.96)}
+
+.fade{animation:fade .35s ease both}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+
+/* ── 등록 버튼 ── */
+.add{width:34px;height:34px;border-radius:50%;background:var(--card2);color:var(--t1);display:grid;place-items:center;flex:none;transition:transform .15s}
+.add svg{width:18px;height:18px}.add:active{transform:scale(.92)}
+/* ── 바텀시트 ── */
+.sheet{position:fixed;inset:0;z-index:50;pointer-events:none}
+.sheet .dim{position:absolute;inset:0;background:rgba(0,0,0,.6);opacity:0;transition:opacity .3s}
+.sheet .panel{position:absolute;left:0;right:0;bottom:0;max-width:520px;margin:0 auto;max-height:92dvh;overflow-y:auto;overscroll-behavior:contain;
+  background:#141416;border-radius:26px 26px 0 0;padding:8px 20px calc(20px + var(--sab));transform:translateY(105%);transition:transform .38s cubic-bezier(.3,.8,.2,1)}
+.sheet.open{pointer-events:auto}.sheet.open .dim{opacity:1}.sheet.open .panel{transform:none}
+.grab{width:38px;height:5px;border-radius:3px;background:#3A3A3F;margin:2px auto 10px}
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.ph h2{font-size:22px;font-weight:800;letter-spacing:-.03em}
+.x{width:34px;height:34px;border-radius:50%;background:var(--card2);display:grid;place-items:center;color:var(--t2)}.x svg{width:16px;height:16px}
+.fl{display:block;font-size:13px;font-weight:600;color:var(--t2);margin:18px 2px 8px}.fl em{font-style:normal;color:var(--t3);font-weight:500;margin-left:4px}
+.in{width:100%;height:52px;border-radius:14px;border:1.5px solid transparent;background:var(--card2);color:var(--t1);font:inherit;font-size:17px;font-weight:600;padding:0 16px;outline:none;transition:border-color .15s;-webkit-appearance:none;appearance:none}
+.in::placeholder{color:var(--t3);font-weight:500}.in:focus{border-color:rgba(255,255,255,.4)}
+.seg.wide{display:flex}.seg.wide button{flex:1;width:auto;height:40px;font-size:15px}
+.seg.wide .knob{width:calc(50% - 3px);height:40px}.seg.wide.f .knob{transform:translateX(100%)}
+.chips{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.chips button{height:44px;border-radius:12px;background:var(--card2);font-size:14px;font-weight:700;color:var(--t2);border:1.5px solid transparent;transition:.15s}
+.chips button.on{color:var(--t1);border-color:rgba(255,255,255,.55);background:#26262A}
+.race{display:grid;grid-template-columns:96px 1fr;gap:8px}
+.yr{font-family:var(--num);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239A9AA1' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-size:14px;padding-right:30px}
+.hms{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.hms div{position:relative}.hms .in{font-family:var(--num);font-size:22px;font-weight:700;text-align:center;padding:0 34px 0 10px;font-variant-numeric:tabular-nums}
+.hms span{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--t3);font-weight:600;pointer-events:none}
+.preview{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;min-height:44px;margin-top:8px;padding:10px 14px;border-radius:12px;background:var(--card);font-size:13px;color:var(--t2)}
+.preview b{font-family:var(--num);color:var(--t1);font-weight:700;margin-left:4px}
+.preview .gap{font-family:var(--num);font-weight:600;color:var(--t3)}
+.preview.cr{background:var(--acc-soft)}
+.preview .new{display:inline-flex;align-items:center;gap:5px;color:var(--acc);font-weight:800}.preview .new svg{width:13px;height:13px}
+.cta{width:100%;height:56px;border-radius:16px;background:var(--t1);color:#0A0A0B;font-size:17px;font-weight:800;margin-top:26px;transition:opacity .2s,transform .1s}
+.cta:disabled{opacity:.3}.cta:not(:disabled):active{transform:scale(.98)}
+.pinlink{display:block;margin:12px auto 0;font-size:12.5px;color:var(--t3);text-decoration:underline;text-underline-offset:3px}
+#pinWrap[hidden]+.cta+.pinlink{display:block}#pinWrap:not([hidden])~.pinlink{display:none}
+/* ── 토스트 ── */
+.toast{position:fixed;left:50%;bottom:calc(var(--tab) + var(--sab) + 18px);z-index:60;transform:translate(-50%,20px);opacity:0;pointer-events:none;
+  background:#2A2A2E;color:var(--t1);font-size:14px;font-weight:600;padding:12px 18px;border-radius:14px;white-space:nowrap;max-width:calc(100% - 32px);
+  box-shadow:0 8px 24px rgba(0,0,0,.4);transition:.3s cubic-bezier(.3,.8,.2,1);display:flex;align-items:center;gap:6px}
+.toast svg{width:14px;height:14px}.toast.gold{background:var(--acc);color:#111}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media (min-width:640px){.sheet .panel{bottom:50%;transform:translateY(calc(50% + 100vh));border-radius:26px;padding-bottom:24px}.sheet.open .panel{transform:translateY(50%)}.grab{display:none}}
+@media (min-width:640px){
+  :root{--rail:112px}
+  .hero-title{padding:12px 24px 24px}.hero-title h1{font-size:36px}
+  .topbar .in{padding:0 24px}
+  .rail{padding-left:16px}.rail button{padding-left:14px;font-size:15px}
+  main{padding-left:20px;padding-right:24px}
+  .rec{padding:26px 26px 22px}.rec .time{font-size:60px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="topbar" id="topbar">
+  <div class="wrap in">
+    <img class="logo" alt="GSRC" src="data:image/png;base64,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">
+    <div class="seg" id="seg" role="tablist" aria-label="성별">
+      <span class="knob"></span>
+      <button data-g="M" class="on" role="tab">남자</button>
+      <button data-g="F" role="tab">여자</button>
+    </div>
+    <button class="add" id="addBtn" aria-label="기록 등록"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero-title">
+    <h1>Hall of Fame<span>명예의전당</span></h1>
+  </section>
+
+  <div class="layout">
+    <nav class="rail" id="rail" aria-label="연도"></nav>
+    <main id="main"></main>
+  </div>
+</div>
+
+<nav class="tabbar" aria-label="종목">
+  <div class="in" id="tabs">
+    <button data-d="full" class="on"><b>풀코스</b></button>
+    <button data-d="32k"><b>32K</b></button>
+    <button data-d="half"><b>하프</b></button>
+    <button data-d="10k"><b>10K</b></button>
+    <button data-d="5k"><b>5K</b></button>
+  </div>
+</nav>
+
+
+<div class="sheet" id="sheet" aria-hidden="true">
+  <div class="dim" id="sheetDim"></div>
+  <form class="panel" id="form" autocomplete="off" novalidate>
+    <div class="grab"></div>
+    <div class="ph"><h2>기록 등록</h2><button type="button" class="x" id="fClose" aria-label="닫기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+
+    <label class="fl">이름</label>
+    <input class="in" id="fName" list="nameList" placeholder="이름" maxlength="20" enterkeyhint="next">
+    <datalist id="nameList"></datalist>
+
+    <label class="fl">성별</label>
+    <div class="seg wide" id="fSeg"><span class="knob"></span><button type="button" data-g="M">남자</button><button type="button" data-g="F">여자</button></div>
+
+    <label class="fl">종목</label>
+    <div class="chips" id="fDist">
+      <button type="button" data-d="full">풀코스</button><button type="button" data-d="32k">32K</button><button type="button" data-d="half">하프</button><button type="button" data-d="10k">10K</button><button type="button" data-d="5k">5K</button>
+    </div>
+
+    <label class="fl">대회</label>
+    <div class="race"><select class="in yr" id="fYear"></select><input class="in" id="fRace" list="raceList" placeholder="예) 동아서울마라톤" maxlength="40" enterkeyhint="next"></div>
+    <datalist id="raceList"></datalist>
+
+    <label class="fl">완주 기록</label>
+    <div class="hms">
+      <div><input class="in" id="fH" inputmode="numeric" placeholder="0"><span>시간</span></div>
+      <div><input class="in" id="fM" inputmode="numeric" placeholder="00"><span>분</span></div>
+      <div><input class="in" id="fS" inputmode="numeric" placeholder="00"><span>초</span></div>
+    </div>
+    <div class="preview" id="preview"></div>
+
+    <label class="fl">한줄평 <em>선택</em></label>
+    <input class="in" id="fNote" placeholder="예) 첫 서브3 잊지 못할듯" maxlength="60">
+
+    <div id="pinWrap"><label class="fl">크루 비밀번호</label>
+    <input class="in" id="fPin" type="password" placeholder="크루 단톡방에 공지된 비밀번호" maxlength="30"></div>
+
+    <button class="cta" id="fSubmit" type="submit" disabled>기록 등록하기</button>
+    <button type="button" class="pinlink" id="pinShow">비밀번호 다시 입력</button>
+  </form>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script>
+/* ============================================================
+   ① 구글시트 연결 주소 — Apps Script 배포 후 받은 주소를 따옴표 안에 붙여넣기
+   ============================================================ */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzGT2dQgAM2ARxykkeQhXuhkydxi66x9TuY-EzsnAnRh9WMwxiRroSpNR7PlYdkIC8IUw/exec";
+
+/* ============================================================
+   ② 기본 기록 (시트 연결 전이거나 인터넷이 끊겼을 때 보여줄 기록)
+   시트 열 순서: 대회 | 코스 | 이름 | 완주기록 | (평균페이스) | (한줄평) | 성별
+   ============================================================ */
+const SHEET = `
+2026 고구려마라톤	32K	안지은	4:12:28	여
+2026 고구려마라톤	32K	임세연	4:12:28	여
+2026 고구려마라톤	32K	정현호	2:37:47	남
+2026 고구려마라톤	32K	이재형	2:41:12	남
+2026 고구려마라톤	32K	김지혜	2:41:11	여
+2026 고구려마라톤	Full	남기석	3:22:23	남
+2026 오사카마라톤	Full	이지훈	5:18:50	남
+2026 챌린지레이스	32K	김명언	DNF/응요	남
+2026 고구려마라톤	32K	이희주	2:21:25	남
+2026 고구려마라톤	32K	하희연	3:18:22	여
+2026 고구려마라톤	Full	윤홍찬	3:10:29	남
+2026 고구려마라톤	32K	김대훈	2:52:53	남
+2026 오사카마라톤	Full	하영수	2:59:34	남
+2026 고구려마라톤	32K	하늘이	3:56:15	여
+2026 고구려마라톤	Full	정준구	4:26:34	남
+2026 고구려마라톤	10K	한동수	0:57:50	남
+2026 고구려마라톤	Half	장주연	2:08:02	여
+2026 고구려마라톤	32K	전민재	2:15:35	남
+2026 고구려마라톤	32K	송수현	3:07:28	여
+2026 고구려마라톤	32K	전희경	3:04:50	여
+2026 고구려마라톤	32K	서성훈	3:13:59	남
+2026 고구려마라톤	Half	최재은	2:21:15	여
+2026 Run your way	Half	정동빈	1:44:52	남
+2026 Run your way	Half	임세연	DNF	여
+2026 Run your way	Half	정현호	1:35:15	남
+2026 Run your way	Half	남기석	1:29:21	남
+2026 Run your way	Half	김명언	1:35:24	남
+2026 Run your way	Half	유혜은	2:09:37	여
+2026 Run your way	Half	하희연	1:58:57	여
+2026 Run your way	Half	김대훈	1:37:13	남
+2026 Run your way	Half	김지민	2:07:48	남
+2026 Run your way	Half	하영수	1:23:32	남
+2026 고양하프마라톤	응요/자봉	[샘플]곽두팔		여
+2026 고양하프마라톤	10K	임세연	0:56:52	여
+2026 고양하프마라톤	10K	김지혜	0:44:21	여
+2026 고양하프마라톤	Half	김민호	1:49:09	남
+2026 고양하프마라톤	Half	남기석	1:41:59	남
+2026 고양하프마라톤	Half	서형관	1:30:54	남
+2026 고양하프마라톤	10K	윤원일	0:56:51	남
+2026 고양하프마라톤	응요/자봉	이재형		남
+2026 고양하프마라톤	응요/자봉	정현호		남
+2026 고양하프마라톤	Half	정슬아	1:57:32	여
+2026 고양하프마라톤	Half	최수빈	2:00:18	남
+2026 고양하프마라톤	응요/자봉	이지훈		남
+2026 고양하프마라톤	Half	김다년	1:44:32	남
+2026 고양하프마라톤	응요/자봉	안지은		여
+2026 고양하프마라톤	Half	이동욱	1:59:18	남
+2026 고양하프마라톤	응요/자봉	주장범		남
+2026 고양하프마라톤	응요/자봉	하희연		여
+2026 고양하프마라톤	10K	박근아	0:53:45	여
+2026 고양하프마라톤	10K	전희경	0:48:27	여
+2026 고양하프마라톤	응요/자봉	최재은		여
+2026 여의도벚꽃마라톤	Half	김민주	2:05:21	남
+2026 동아서울마라톤	10K	남기석	0:38:28	남
+2026 동아서울마라톤	10K	구현우	0:47:49	남
+2026 동아서울마라톤	Full	최이현	4:49:42	여
+2026 동아서울마라톤	Full	주장범	5:03:54	남
+2026 동아서울마라톤	응요/자봉	이지훈		남
+2026 동아서울마라톤	응요/자봉	이재형		남
+2026 동아서울마라톤	응요/자봉	정준구		남
+2026 동아서울마라톤	Full	김명언	3:53:44	남
+2026 동아서울마라톤	Full	김동찬	3:56:17	남
+2026 동아서울마라톤	Full	이희주	3:06:46	남
+2026 동아서울마라톤	Full	전민재	3:00:14	남
+2026 동아서울마라톤	Full	정현호	DNF	남
+2026 동아서울마라톤	Full	송수현	3:55:56	여
+2026 동아서울마라톤	응요/자봉	임세연		여
+2026 동아서울마라톤	Full	한호규	3:26:43	남
+2026 동아서울마라톤	Full	오성훈	2:59:41	남
+2026 동아서울마라톤	응요/자봉	김지혜		여
+2026 동아서울마라톤	응요/자봉	유혜은		여
+2026 동아서울마라톤	Full	하영수	2:57:05	남
+2026 동아서울마라톤	10K	장주연	0:56:23	여
+2026 동아서울마라톤	응요/자봉	이성희		여
+2026 동아서울마라톤	응요/자봉	하늘이		여
+2026 동아서울마라톤	응요/자봉	전희경		여
+2026 팀 K리그런	10K	안지은	1:10:24	여
+2026 팀 K리그런	10K	김지혜	1:09:44	여
+2026 팀 K리그런	10K	강나그네	1:00:19	남
+2026 팀 K리그런	10K	임세연	1:10:24	여
+2026 팀 K리그런	10K	송수현	1:14:54	여
+2026 팀 K리그런	10K	김영식	0:47:16	남
+2026 팀 K리그런	10K	윤영재	0:49:09	남
+2026 팀 K리그런	10K	이지훈	0:53:38	남
+2026 팀 K리그런	10K	유혜은	1:10:15	여
+2026 김포한강마라톤	Full	전희경	4:28:45	여
+2026 합천벚꽃마라톤	Full	정동빈	4:26:34	남
+2026 은평벚꽃마라톤	응요/자봉	안지은		여
+2026 은평벚꽃마라톤	5K	정현호	0:21:33	남
+2026 은평벚꽃마라톤	5K	김지혜	0:21:49	여
+2026 은평벚꽃마라톤	응요/자봉	이재형		남
+2026 은평벚꽃마라톤	응요/자봉	하늘이		여
+2026 은평벚꽃마라톤	5K	임세연	0:28:00	여
+2026 은평벚꽃마라톤	응요/자봉	송수현		여
+2026 은평벚꽃마라톤	5K	김영식	1:00:23	남
+2026 은평벚꽃마라톤	10K	한동수	0:52:59	남
+2026 은평벚꽃마라톤	10K	김혜미	1:01:20	여
+2026 은평벚꽃마라톤	응요/자봉	남기석		남
+`;
+
+const DIST = {
+  full:{ko:"풀코스",km:42.195,sheet:"Full",keys:["full","풀","풀코스"]},
+  "32k":{ko:"32K",km:32,sheet:"32K",keys:["32k"]},
+  half:{ko:"하프",km:21.0975,sheet:"Half",keys:["half","하프"]},
+  "10k":{ko:"10K",km:10,sheet:"10K",keys:["10k"]},
+  "5k":{ko:"5K",km:5,sheet:"5K",keys:["5k"]}
+};
+const G = {M:"남자",F:"여자"};
+const st = {g:"M",d:"full",y:"all",expanded:false};
+try{Object.assign(st,JSON.parse(localStorage.getItem("gsrc-hof")||"{}"));st.expanded=false}catch(e){}
+
+const sec = t => t.split(":").map(Number).reduce((a,b)=>a*60+b,0);
+const fmt = s => {const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;
+  return h?`${h}:${String(m).padStart(2,"0")}:${String(x).padStart(2,"0")}`:`${m}:${String(x).padStart(2,"0")}`};
+const fmtFull = s => `${Math.floor(s/3600)}:${String(Math.floor(s%3600/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+const pace = (s,km) => {const p=Math.round(s/km);return `${Math.floor(p/60)}'${String(p%60).padStart(2,"0")}"`};
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* 시트 줄 → 기록 (DNF·응요/자봉·빈 기록·[샘플]은 자동 제외) */
+function parseRows(rows){
+  return rows.map((c,i)=>{
+    c=(c||[]).map(x=>String(x??"").trim()); if(c.length<5) return null;
+    const [race,course,name,timeRaw]=c, gender=c.length>=7?c[6]:c[c.length-1], note=c.length>=7?c[5]:"";
+    const d=Object.keys(DIST).find(k=>DIST[k].keys.includes(course.toLowerCase().replace(/\s/g,"")));
+    const g=gender.startsWith("남")?"M":gender.startsWith("여")?"F":null;
+    const tm=(timeRaw.match(/\d{1,2}:\d{2}(:\d{2})?/)||[])[0];
+    if(!d||!g||!name||name.includes("[샘플]")||!tm||/dnf/i.test(timeRaw)) return null;
+    const s=sec(tm); if(!s) return null;
+    const y=(race.match(/^(\d{4})/)||[])[1]||"기타";
+    return {race,raceShort:race.replace(/^\d{4}\s*/,""),name,dist:d,gender:g,s,y,note,order:i};
+  }).filter(Boolean);
+}
+let all = parseRows(SHEET.trim().split("\n").map(l=>l.split("\t")));
+try{const c=JSON.parse(localStorage.getItem("gsrc-hof-cache")||"null");if(c&&c.length)all=parseRows(c)}catch(e){}
+
+const byTime = (a,b) => a.s-b.s || a.order-b.order;
+function best(list){
+  const m=new Map();
+  for(const r of list){const p=m.get(r.name);if(!p||byTime(r,p)<0)m.set(r.name,r)}
+  const arr=[...m.values()].sort(byTime);
+  arr.forEach((r,i)=>r.rank=(i&&arr[i-1].s===r.s)?arr[i-1].rank:i+1);
+  return arr;
+}
+const recordOf = (g,d) => best(all.filter(r=>r.gender===g&&r.dist===d))[0];
+
+const $ = id => document.getElementById(id);
+const crown = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 7l4.5 4L12 4l4.5 7L21 7l-2 12H5L3 7z"/></svg>';
+
+function render(){
+  try{localStorage.setItem("gsrc-hof",JSON.stringify({g:st.g,d:st.d,y:st.y}))}catch(e){}
+  $("seg").classList.toggle("f",st.g==="F");
+  $("seg").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.g===st.g));
+  $("tabs").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.d===st.d));
+  const years=[...new Set(all.map(r=>r.y))].sort().reverse();
+  if(st.y!=="all"&&!years.includes(st.y))st.y="all";
+  $("rail").innerHTML=`<button class="ko ${st.y==="all"?"on":""}" data-y="all">역대</button><div class="div"></div>`+
+    years.map(y=>`<button class="${st.y===y?"on":""}" data-y="${y}">${y}</button>`).join("");
+
+  const D=DIST[st.d], pool=all.filter(r=>r.gender===st.g&&r.dist===st.d);
+  const allRank=best(pool), recs=allRank.filter(r=>r.rank===1), rec=recs[0];
+  const isAll=st.y==="all";
+  const rank = isAll?allRank:best(pool.filter(r=>r.y===st.y));
+  const isRec = r => rec && r.s===rec.s && recs.some(x=>x.name===r.name);
+  let h="";
+
+  // 연도별 화면: 아직 깨지지 않은 크루 기록을 항상 맨 위에 고정
+  if(!isAll && rec){
+    h+=`<div class="pinrec"><span class="ic">${crown}</span>
+      <div class="tx"><div class="k">아직 깨지지 않은 기록</div><div class="v">${recs.map(r=>esc(r.name)).join(" · ")}<small>${esc(rec.raceShort)}</small></div></div>
+      <div class="tm">${fmt(rec.s)}</div></div>`;
+  }
+
+  h+=`<div class="boardhead"><div><span class="sub">${G[st.g]} ${D.ko}</span><h3>${isAll?"역대 순위":st.y+"년 순위"}</h3></div><span>${rank.length}명 · 1인 최고기록</span></div>`;
+
+  if(!rank.length){
+    h+=`<div class="empty">${isAll?"아직":st.y+"년"} ${G[st.g]} ${D.ko} 기록이 없어요</div>`;
+  }else{
+    // 시상대 (2위 · 1위 · 3위)
+    const top=rank.slice(0,3);
+    const slot=(r,pos)=>{
+      if(!r) return `<div class="pd p${pos} empty-slot"></div>`;
+      const g=Math.min(r.rank,3);
+      return `<div class="pd p${pos} g${g}">
+        ${isRec(r)?`<span class="crtag">${crown}${isAll?"깨지지 않은 기록":"크루 기록"}</span>`:""}
+        <div class="medal">${r.rank}</div>
+        <div class="pn">${esc(r.name)}</div>
+        <div class="pt">${fmt(r.s)}</div>
+        <div class="pp">${pace(r.s,D.km)}/km</div>
+        <div class="stand"></div>
+      </div>`;
+    };
+    h+=`<div class="podium">${slot(top[1],2)}${slot(top[0],1)}${slot(top[2],3)}</div>`;
+
+    // 4위부터 목록
+    const rest=rank.slice(3), LIMIT=7, shown=st.expanded?rest:rest.slice(0,LIMIT);
+    if(rest.length){
+      h+=`<div class="list" style="margin-top:12px">`+shown.map(r=>`<div class="row">
+          <div class="rank">${r.rank}</div>
+          <div class="who"><div class="n">${esc(r.name)}${isRec(r)?'<span class="cr">CR</span>':""}</div><div class="s">${esc(isAll?r.race:r.raceShort)}</div></div>
+          <div class="res"><div class="t">${fmt(r.s)}</div><div class="p">${pace(r.s,D.km)}/km</div></div>
+        </div>`).join("")+
+        (rest.length>LIMIT?`<button class="more" id="more">${st.expanded?"접기":`${rest.length-LIMIT}명 더 보기`}</button>`:"")+`</div>`;
+    }
+    if(rec && isAll){
+      const second=allRank.find(r=>r.rank>1);
+      if(rec.note) h+=`<p class="quote">“${esc(rec.note)}” <span>— ${esc(rec.name)}</span></p>`;
+    }
+  }
+  h+=`<p class="foot">CR = Crew Record · 아직 깨지지 않은 크루 최고기록</p>`;
+  $("main").innerHTML=h;
+  $("main").classList.remove("fade");void $("main").offsetWidth;$("main").classList.add("fade");
+  const more=$("more"); if(more) more.onclick=()=>{st.expanded=!st.expanded;render()};
+}
+
+$("seg").addEventListener("click",e=>{const b=e.target.closest("button");if(b&&b.dataset.g!==st.g){st.g=b.dataset.g;st.expanded=false;render()}});
+$("tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(b&&b.dataset.d!==st.d){st.d=b.dataset.d;st.expanded=false;render();scrollTo({top:0,behavior:"smooth"})}});
+$("rail").addEventListener("click",e=>{const b=e.target.closest("button");if(b&&b.dataset.y!==st.y){st.y=b.dataset.y;st.expanded=false;render()}});
+addEventListener("scroll",()=>$("topbar").classList.toggle("scrolled",scrollY>8),{passive:true});
+
+/* ── 구글시트에서 최신 기록 불러오기 ── */
+async function loadSheet(){
+  if(!SCRIPT_URL) return;
+  try{
+    const r=await fetch(SCRIPT_URL,{cache:"no-store"}); const j=await r.json();
+    if(j.ok&&Array.isArray(j.rows)){
+      all=parseRows(j.rows); render();
+      try{localStorage.setItem("gsrc-hof-cache",JSON.stringify(j.rows))}catch(e){}
+    }
+  }catch(e){toast("최신 기록을 불러오지 못했어요. 저장된 기록을 보여드려요")}
+}
+
+/* ── 토스트 ── */
+let toastT;
+function toast(msg,gold){const t=$("toast");t.innerHTML=msg;t.classList.toggle("gold",!!gold);t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),2800)}
+
+/* ── 기록 등록 시트 ── */
+const f = {g:"M",d:"full"};
+function openForm(){
+  f.g=st.g; f.d=st.d;
+  const ys=[];for(let y=new Date().getFullYear();y>=2020;y--)ys.push(y);
+  $("fYear").innerHTML=ys.map(y=>`<option>${y}</option>`).join("");
+  $("raceList").innerHTML=[...new Set(all.map(r=>r.raceShort))].sort().map(r=>`<option value="${esc(r)}">`).join("");
+  $("nameList").innerHTML=[...new Set(all.map(r=>r.name))].sort().map(r=>`<option value="${esc(r)}">`).join("");
+  try{$("fPin").value=localStorage.getItem("gsrc-hof-pin")||""}catch(e){}
+  $("pinWrap").hidden=!!$("fPin").value;
+  syncForm(); $("sheet").classList.add("open"); document.body.style.overflow="hidden";
+  setTimeout(()=>$("fName").focus(),300);
+}
+function closeForm(){$("sheet").classList.remove("open");document.body.style.overflow=""}
+function formSec(){const h=+$("fH").value||0,m=+$("fM").value||0,s=+$("fS").value||0;return (m>59||s>59)?0:h*3600+m*60+s}
+function syncForm(){
+  $("fSeg").classList.toggle("f",f.g==="F");
+  $("fSeg").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.g===f.g));
+  $("fDist").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.d===f.d));
+  const s=formSec(), D=DIST[f.d], rec=recordOf(f.g,f.d), p=$("preview");
+  if(s>0){
+    const isCR=!rec||s<rec.s;
+    p.className="preview"+(isCR?" cr":"");
+    p.innerHTML=`<span>평균 페이스 <b>${pace(s,D.km)}/km</b></span>`+
+      (isCR?`<span class="new">${crown}크루 신기록!</span>`:`<span class="gap">크루 기록까지 +${fmt(s-rec.s)}</span>`);
+  }else{p.className="preview";p.innerHTML=`<span>기록을 입력하면 페이스를 계산해 드려요</span>`}
+  const ok=$("fName").value.trim()&&$("fRace").value.trim()&&s>0;
+  $("fSubmit").disabled=!ok;
+}
+$("addBtn").onclick=openForm;
+$("sheetDim").onclick=closeForm;
+$("fClose").onclick=closeForm;
+$("fSeg").onclick=e=>{const b=e.target.closest("button");if(b){f.g=b.dataset.g;syncForm()}};
+$("fDist").onclick=e=>{const b=e.target.closest("button");if(b){f.d=b.dataset.d;syncForm()}};
+["fName","fRace","fH","fM","fS"].forEach(id=>$(id).addEventListener("input",syncForm));
+["fH","fM","fS"].forEach((id,i,a)=>$(id).addEventListener("input",e=>{ // 두 자리 입력 시 다음 칸으로
+  const el=e.target; el.value=el.value.replace(/\D/g,"").slice(0,2);
+  if(el.value.length===2&&a[i+1])$(a[i+1]).focus();
+}));
+$("pinShow").onclick=()=>{$("pinWrap").hidden=false;$("fPin").focus()};
+
+$("form").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const s=formSec(), D=DIST[f.d];
+  const pin=$("fPin").value.trim();
+  if(!pin){$("pinWrap").hidden=false;$("fPin").focus();toast("크루 비밀번호를 입력해 주세요");return}
+  const p=Math.round(s/D.km), row={
+    race:`${$("fYear").value} ${$("fRace").value.trim()}`, course:D.sheet, name:$("fName").value.trim(),
+    time:fmtFull(s), pace:String(Math.floor(p/60)*100+p%60), note:$("fNote").value.trim(),
+    gender:f.g==="M"?"남":"여", pin
+  };
+  if(!SCRIPT_URL){toast("아직 구글시트가 연결되지 않았어요");return}
+  const btn=$("fSubmit"); btn.disabled=true; btn.textContent="저장 중…";
+  try{
+    const r=await fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify(row)}); const j=await r.json();
+    if(!j.ok) throw new Error(j.error||"저장하지 못했어요");
+    try{localStorage.setItem("gsrc-hof-pin",pin)}catch(e){}
+    const rec=recordOf(f.g,f.d), isCR=!rec||s<rec.s;
+    all.push(...parseRows([[row.race,row.course,row.name,row.time,row.pace,row.note,row.gender]]).map(x=>({...x,order:1e9})));
+    st.g=f.g; st.d=f.d; st.y="all"; render(); closeForm();
+    ["fName","fRace","fH","fM","fS","fNote"].forEach(id=>$(id).value="");
+    toast(isCR?`${crown} 크루 신기록 등록! 축하해요`:"기록이 등록됐어요",isCR);
+    scrollTo({top:0,behavior:"smooth"}); loadSheet();
+  }catch(err){
+    if(/비밀번호/.test(err.message)){try{localStorage.removeItem("gsrc-hof-pin")}catch(e){} $("pinWrap").hidden=false}
+    toast(esc(err.message||"저장하지 못했어요. 잠시 후 다시 시도해 주세요"));
+  }finally{btn.textContent="기록 등록하기";syncForm()}
+});
+addEventListener("keydown",e=>{if(e.key==="Escape")closeForm()});
+
+render();
+loadSheet();
+</script>
+</body>
+</html>
