@@ -114,7 +114,9 @@ main{padding:0 16px calc(var(--tab) + var(--sab) + 32px) 10px;min-width:0}
 .rec .co{font-size:12px;font-weight:700;color:var(--acc);vertical-align:middle}
 .rec .note{font-size:13.5px;color:var(--t1);opacity:.85;margin-top:10px;line-height:1.5}
 .foot{font-size:11.5px;color:var(--t3);text-align:center;margin-top:20px}
-.empty{padding:44px 20px;text-align:center;color:var(--t3);font-size:14px;background:var(--card);border-radius:18px}
+.empty{padding:40px 20px 28px;text-align:center;color:var(--t3);font-size:14px;background:var(--card);border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.empty b{color:var(--t1);font-size:16px;font-weight:700}
+.emptycta{margin-top:14px;height:42px;padding:0 18px;border-radius:12px;background:var(--card2);color:var(--t1);font-size:14px;font-weight:700}
 .sample{display:inline-block;margin-left:8px;font-size:11px;font-weight:600;color:var(--t2);background:var(--card2);padding:3px 7px;border-radius:6px;vertical-align:middle;letter-spacing:0}
 
 
@@ -190,7 +192,7 @@ main{padding:0 16px calc(var(--tab) + var(--sab) + 32px) 10px;min-width:0}
 .chips{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
 .chips button{height:44px;border-radius:12px;background:var(--card2);font-size:14px;font-weight:700;color:var(--t2);border:1.5px solid transparent;transition:.15s}
 .chips button.on{color:var(--t1);border-color:rgba(255,255,255,.55);background:#26262A}
-.race{display:grid;grid-template-columns:96px 1fr;gap:8px}
+.date{font-family:var(--num);color-scheme:dark}
 .yr{font-family:var(--num);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239A9AA1' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-size:14px;padding-right:30px}
 .hms{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .hms div{position:relative}.hms .in{font-family:var(--num);font-size:22px;font-weight:700;text-align:center;padding:0 34px 0 10px;font-variant-numeric:tabular-nums}
@@ -276,7 +278,9 @@ main{padding:0 16px calc(var(--tab) + var(--sab) + 32px) 10px;min-width:0}
     </div>
 
     <label class="fl">대회</label>
-    <div class="race"><select class="in yr" id="fYear"></select><input class="in" id="fRace" list="raceList" placeholder="예) 동아서울마라톤" maxlength="40" enterkeyhint="next"></div>
+    <input class="in" id="fRace" list="raceList" placeholder="예) 동아서울마라톤" maxlength="40" enterkeyhint="next">
+    <label class="fl">대회 날짜</label>
+    <input class="in date" id="fDate" type="date">
     <datalist id="raceList"></datalist>
 
     <label class="fl">완주 기록</label>
@@ -302,111 +306,11 @@ main{padding:0 16px calc(var(--tab) + var(--sab) + 32px) 10px;min-width:0}
 /* ============================================================
    ① 구글시트 연결 주소 — Apps Script 배포 후 받은 주소를 따옴표 안에 붙여넣기
    ============================================================ */
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzGT2dQgAM2ARxykkeQhXuhkydxi66x9TuY-EzsnAnRh9WMwxiRroSpNR7PlYdkIC8IUw/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx0l-I2vAWlRNSUT5AkCLzL5BruxyhFyMk9PnoKJtsbMuK9CZ8_5XHFhHc0-n33Ky6c/exec";
 
-/* ============================================================
-   ② 기본 기록 (시트 연결 전이거나 인터넷이 끊겼을 때 보여줄 기록)
-   시트 열 순서: 대회 | 코스 | 이름 | 완주기록 | (평균페이스) | (한줄평) | 성별
-   ============================================================ */
+/* 기록은 모두 구글시트(명예의전당 탭)에서 불러와요. 아래는 비워두세요. */
 const SHEET = `
-2026 고구려마라톤	32K	안지은	4:12:28	여
-2026 고구려마라톤	32K	임세연	4:12:28	여
-2026 고구려마라톤	32K	정현호	2:37:47	남
-2026 고구려마라톤	32K	이재형	2:41:12	남
-2026 고구려마라톤	32K	김지혜	2:41:11	여
-2026 고구려마라톤	Full	남기석	3:22:23	남
-2026 오사카마라톤	Full	이지훈	5:18:50	남
-2026 챌린지레이스	32K	김명언	DNF/응요	남
-2026 고구려마라톤	32K	이희주	2:21:25	남
-2026 고구려마라톤	32K	하희연	3:18:22	여
-2026 고구려마라톤	Full	윤홍찬	3:10:29	남
-2026 고구려마라톤	32K	김대훈	2:52:53	남
-2026 오사카마라톤	Full	하영수	2:59:34	남
-2026 고구려마라톤	32K	하늘이	3:56:15	여
-2026 고구려마라톤	Full	정준구	4:26:34	남
-2026 고구려마라톤	10K	한동수	0:57:50	남
-2026 고구려마라톤	Half	장주연	2:08:02	여
-2026 고구려마라톤	32K	전민재	2:15:35	남
-2026 고구려마라톤	32K	송수현	3:07:28	여
-2026 고구려마라톤	32K	전희경	3:04:50	여
-2026 고구려마라톤	32K	서성훈	3:13:59	남
-2026 고구려마라톤	Half	최재은	2:21:15	여
-2026 Run your way	Half	정동빈	1:44:52	남
-2026 Run your way	Half	임세연	DNF	여
-2026 Run your way	Half	정현호	1:35:15	남
-2026 Run your way	Half	남기석	1:29:21	남
-2026 Run your way	Half	김명언	1:35:24	남
-2026 Run your way	Half	유혜은	2:09:37	여
-2026 Run your way	Half	하희연	1:58:57	여
-2026 Run your way	Half	김대훈	1:37:13	남
-2026 Run your way	Half	김지민	2:07:48	남
-2026 Run your way	Half	하영수	1:23:32	남
-2026 고양하프마라톤	응요/자봉	[샘플]곽두팔		여
-2026 고양하프마라톤	10K	임세연	0:56:52	여
-2026 고양하프마라톤	10K	김지혜	0:44:21	여
-2026 고양하프마라톤	Half	김민호	1:49:09	남
-2026 고양하프마라톤	Half	남기석	1:41:59	남
-2026 고양하프마라톤	Half	서형관	1:30:54	남
-2026 고양하프마라톤	10K	윤원일	0:56:51	남
-2026 고양하프마라톤	응요/자봉	이재형		남
-2026 고양하프마라톤	응요/자봉	정현호		남
-2026 고양하프마라톤	Half	정슬아	1:57:32	여
-2026 고양하프마라톤	Half	최수빈	2:00:18	남
-2026 고양하프마라톤	응요/자봉	이지훈		남
-2026 고양하프마라톤	Half	김다년	1:44:32	남
-2026 고양하프마라톤	응요/자봉	안지은		여
-2026 고양하프마라톤	Half	이동욱	1:59:18	남
-2026 고양하프마라톤	응요/자봉	주장범		남
-2026 고양하프마라톤	응요/자봉	하희연		여
-2026 고양하프마라톤	10K	박근아	0:53:45	여
-2026 고양하프마라톤	10K	전희경	0:48:27	여
-2026 고양하프마라톤	응요/자봉	최재은		여
-2026 여의도벚꽃마라톤	Half	김민주	2:05:21	남
-2026 동아서울마라톤	10K	남기석	0:38:28	남
-2026 동아서울마라톤	10K	구현우	0:47:49	남
-2026 동아서울마라톤	Full	최이현	4:49:42	여
-2026 동아서울마라톤	Full	주장범	5:03:54	남
-2026 동아서울마라톤	응요/자봉	이지훈		남
-2026 동아서울마라톤	응요/자봉	이재형		남
-2026 동아서울마라톤	응요/자봉	정준구		남
-2026 동아서울마라톤	Full	김명언	3:53:44	남
-2026 동아서울마라톤	Full	김동찬	3:56:17	남
-2026 동아서울마라톤	Full	이희주	3:06:46	남
-2026 동아서울마라톤	Full	전민재	3:00:14	남
-2026 동아서울마라톤	Full	정현호	DNF	남
-2026 동아서울마라톤	Full	송수현	3:55:56	여
-2026 동아서울마라톤	응요/자봉	임세연		여
-2026 동아서울마라톤	Full	한호규	3:26:43	남
-2026 동아서울마라톤	Full	오성훈	2:59:41	남
-2026 동아서울마라톤	응요/자봉	김지혜		여
-2026 동아서울마라톤	응요/자봉	유혜은		여
-2026 동아서울마라톤	Full	하영수	2:57:05	남
-2026 동아서울마라톤	10K	장주연	0:56:23	여
-2026 동아서울마라톤	응요/자봉	이성희		여
-2026 동아서울마라톤	응요/자봉	하늘이		여
-2026 동아서울마라톤	응요/자봉	전희경		여
-2026 팀 K리그런	10K	안지은	1:10:24	여
-2026 팀 K리그런	10K	김지혜	1:09:44	여
-2026 팀 K리그런	10K	강나그네	1:00:19	남
-2026 팀 K리그런	10K	임세연	1:10:24	여
-2026 팀 K리그런	10K	송수현	1:14:54	여
-2026 팀 K리그런	10K	김영식	0:47:16	남
-2026 팀 K리그런	10K	윤영재	0:49:09	남
-2026 팀 K리그런	10K	이지훈	0:53:38	남
-2026 팀 K리그런	10K	유혜은	1:10:15	여
-2026 김포한강마라톤	Full	전희경	4:28:45	여
-2026 합천벚꽃마라톤	Full	정동빈	4:26:34	남
-2026 은평벚꽃마라톤	응요/자봉	안지은		여
-2026 은평벚꽃마라톤	5K	정현호	0:21:33	남
-2026 은평벚꽃마라톤	5K	김지혜	0:21:49	여
-2026 은평벚꽃마라톤	응요/자봉	이재형		남
-2026 은평벚꽃마라톤	응요/자봉	하늘이		여
-2026 은평벚꽃마라톤	5K	임세연	0:28:00	여
-2026 은평벚꽃마라톤	응요/자봉	송수현		여
-2026 은평벚꽃마라톤	5K	김영식	1:00:23	남
-2026 은평벚꽃마라톤	10K	한동수	0:52:59	남
-2026 은평벚꽃마라톤	10K	김혜미	1:01:20	여
-2026 은평벚꽃마라톤	응요/자봉	남기석		남
+
 `;
 
 const DIST = {
@@ -427,22 +331,36 @@ const fmtFull = s => `${Math.floor(s/3600)}:${String(Math.floor(s%3600/60)).padS
 const pace = (s,km) => {const p=Math.round(s/km);return `${Math.floor(p/60)}'${String(p%60).padStart(2,"0")}"`};
 const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-/* 시트 줄 → 기록 (DNF·응요/자봉·빈 기록·[샘플]은 자동 제외) */
+/* 시트 줄 → 기록 (머리줄의 칸 이름으로 위치를 찾아요 / DNF·응요·빈 기록·[샘플] 자동 제외) */
 function parseRows(rows){
+  rows=(rows||[]).map(c=>(c||[]).map(x=>String(x??"").trim()));
+  const hi=rows.findIndex(r=>r.includes("이름")&&r.includes("코스"));
+  let col;
+  if(hi>=0){
+    const H=rows[hi], f=p=>H.findIndex(x=>x.startsWith(p));
+    col={date:f("날짜"),course:f("코스"),name:f("이름"),time:f("완주"),note:f("한줄평"),gender:f("성별")};
+    col.race=H.findIndex(x=>x.includes("대회")); if(col.race<0) col.race=col.course-1;
+    rows=rows.slice(hi+1);
+  }else{ // 예전 형식: 대회|코스|이름|기록|(페이스)|(한줄평)|성별
+    col={date:-1,race:0,course:1,name:2,time:3,note:5,gender:-2};
+  }
+  const g=(c,i)=>i===-2?c[c.length-1]:(i>=0?(c[i]||""):"");
   return rows.map((c,i)=>{
-    c=(c||[]).map(x=>String(x??"").trim()); if(c.length<5) return null;
-    const [race,course,name,timeRaw]=c, gender=c.length>=7?c[6]:c[c.length-1], note=c.length>=7?c[5]:"";
+    const race=g(c,col.race), course=g(c,col.course), name=g(c,col.name), timeRaw=g(c,col.time),
+          gender=g(c,col.gender), note=col.gender===-2&&c.length<7?"":g(c,col.note), date=g(c,col.date);
     const d=Object.keys(DIST).find(k=>DIST[k].keys.includes(course.toLowerCase().replace(/\s/g,"")));
-    const g=gender.startsWith("남")?"M":gender.startsWith("여")?"F":null;
+    const gg=gender.startsWith("남")?"M":gender.startsWith("여")?"F":null;
     const tm=(timeRaw.match(/\d{1,2}:\d{2}(:\d{2})?/)||[])[0];
-    if(!d||!g||!name||name.includes("[샘플]")||!tm||/dnf/i.test(timeRaw)) return null;
+    if(!d||!gg||!name||name.includes("[샘플]")||!tm||/dnf/i.test(timeRaw)) return null;
     const s=sec(tm); if(!s) return null;
-    const y=(race.match(/^(\d{4})/)||[])[1]||"기타";
-    return {race,raceShort:race.replace(/^\d{4}\s*/,""),name,dist:d,gender:g,s,y,note,order:i};
+    const y=(race.match(/^(\d{4})/)||date.match(/^(\d{4})/)||[])[1]||"기타";
+    const md=(date.match(/^\d{4}[-./]\s*(\d{1,2})[-./]\s*(\d{1,2})/)||[]);
+    return {race,raceShort:race.replace(/^\d{4}\s*/,""),name,dist:d,gender:gg,s,y,note,
+      md:md.length?`${md[1].padStart(2,"0")}.${md[2].padStart(2,"0")}`:"",order:i};
   }).filter(Boolean);
 }
 let all = parseRows(SHEET.trim().split("\n").map(l=>l.split("\t")));
-try{const c=JSON.parse(localStorage.getItem("gsrc-hof-cache")||"null");if(c&&c.length)all=parseRows(c)}catch(e){}
+try{const c=JSON.parse(localStorage.getItem("gsrc-hof-cache3")||"null");if(c&&c.length){const p=parseRows(c);if(p.length)all=p}}catch(e){}
 
 const byTime = (a,b) => a.s-b.s || a.order-b.order;
 function best(list){
@@ -484,7 +402,7 @@ function render(){
   h+=`<div class="boardhead"><div><span class="sub">${G[st.g]} ${D.ko}</span><h3>${isAll?"역대 순위":st.y+"년 순위"}</h3></div><span>${rank.length}명 · 1인 최고기록</span></div>`;
 
   if(!rank.length){
-    h+=`<div class="empty">${isAll?"아직":st.y+"년"} ${G[st.g]} ${D.ko} 기록이 없어요</div>`;
+    h+=`<div class="empty"><b>${isAll?"아직":st.y+"년"} ${G[st.g]} ${D.ko} 기록이 없어요</b><span>첫 번째 크루 기록의 주인공이 되어보세요</span><button class="emptycta" id="emptyAdd">＋ 기록 등록하기</button></div>`;
   }else{
     // 시상대 (2위 · 1위 · 3위)
     const top=rank.slice(0,3);
@@ -507,7 +425,7 @@ function render(){
     if(rest.length){
       h+=`<div class="list" style="margin-top:12px">`+shown.map(r=>`<div class="row">
           <div class="rank">${r.rank}</div>
-          <div class="who"><div class="n">${esc(r.name)}${isRec(r)?'<span class="cr">CR</span>':""}</div><div class="s">${esc(isAll?r.race:r.raceShort)}</div></div>
+          <div class="who"><div class="n">${esc(r.name)}${isRec(r)?'<span class="cr">CR</span>':""}</div><div class="s">${esc(isAll?r.race:r.raceShort)}${r.md?" · "+r.md:""}</div></div>
           <div class="res"><div class="t">${fmt(r.s)}</div><div class="p">${pace(r.s,D.km)}/km</div></div>
         </div>`).join("")+
         (rest.length>LIMIT?`<button class="more" id="more">${st.expanded?"접기":`${rest.length-LIMIT}명 더 보기`}</button>`:"")+`</div>`;
@@ -521,6 +439,7 @@ function render(){
   $("main").innerHTML=h;
   $("main").classList.remove("fade");void $("main").offsetWidth;$("main").classList.add("fade");
   const more=$("more"); if(more) more.onclick=()=>{st.expanded=!st.expanded;render()};
+  const ea=$("emptyAdd"); if(ea) ea.onclick=()=>openForm();
 }
 
 $("seg").addEventListener("click",e=>{const b=e.target.closest("button");if(b&&b.dataset.g!==st.g){st.g=b.dataset.g;st.expanded=false;render()}});
@@ -535,7 +454,7 @@ async function loadSheet(){
     const r=await fetch(SCRIPT_URL,{cache:"no-store"}); const j=await r.json();
     if(j.ok&&Array.isArray(j.rows)){
       all=parseRows(j.rows); render();
-      try{localStorage.setItem("gsrc-hof-cache",JSON.stringify(j.rows))}catch(e){}
+      try{localStorage.setItem("gsrc-hof-cache3",JSON.stringify(j.rows))}catch(e){}
     }
   }catch(e){toast("최신 기록을 불러오지 못했어요. 저장된 기록을 보여드려요")}
 }
@@ -548,8 +467,8 @@ function toast(msg,gold){const t=$("toast");t.innerHTML=msg;t.classList.toggle("
 const f = {g:"M",d:"full"};
 function openForm(){
   f.g=st.g; f.d=st.d;
-  const ys=[];for(let y=new Date().getFullYear();y>=2020;y--)ys.push(y);
-  $("fYear").innerHTML=ys.map(y=>`<option>${y}</option>`).join("");
+  if(!$("fDate").value){const n=new Date(Date.now()+9*3600e3);$("fDate").value=n.toISOString().slice(0,10)}
+  $("fDate").max=new Date(Date.now()+9*3600e3).toISOString().slice(0,10);
   $("raceList").innerHTML=[...new Set(all.map(r=>r.raceShort))].sort().map(r=>`<option value="${esc(r)}">`).join("");
   $("nameList").innerHTML=[...new Set(all.map(r=>r.name))].sort().map(r=>`<option value="${esc(r)}">`).join("");
   try{$("fPin").value=localStorage.getItem("gsrc-hof-pin")||""}catch(e){}
@@ -570,7 +489,7 @@ function syncForm(){
     p.innerHTML=`<span>평균 페이스 <b>${pace(s,D.km)}/km</b></span>`+
       (isCR?`<span class="new">${crown}크루 신기록!</span>`:`<span class="gap">크루 기록까지 +${fmt(s-rec.s)}</span>`);
   }else{p.className="preview";p.innerHTML=`<span>기록을 입력하면 페이스를 계산해 드려요</span>`}
-  const ok=$("fName").value.trim()&&$("fRace").value.trim()&&s>0;
+  const ok=$("fName").value.trim()&&$("fRace").value.trim()&&$("fDate").value&&s>0;
   $("fSubmit").disabled=!ok;
 }
 $("addBtn").onclick=openForm;
@@ -578,7 +497,7 @@ $("sheetDim").onclick=closeForm;
 $("fClose").onclick=closeForm;
 $("fSeg").onclick=e=>{const b=e.target.closest("button");if(b){f.g=b.dataset.g;syncForm()}};
 $("fDist").onclick=e=>{const b=e.target.closest("button");if(b){f.d=b.dataset.d;syncForm()}};
-["fName","fRace","fH","fM","fS"].forEach(id=>$(id).addEventListener("input",syncForm));
+["fName","fRace","fDate","fH","fM","fS"].forEach(id=>$(id).addEventListener("input",syncForm));
 ["fH","fM","fS"].forEach((id,i,a)=>$(id).addEventListener("input",e=>{ // 두 자리 입력 시 다음 칸으로
   const el=e.target; el.value=el.value.replace(/\D/g,"").slice(0,2);
   if(el.value.length===2&&a[i+1])$(a[i+1]).focus();
@@ -591,7 +510,7 @@ $("form").addEventListener("submit",async e=>{
   const pin=$("fPin").value.trim();
   if(!pin){$("pinWrap").hidden=false;$("fPin").focus();toast("크루 비밀번호를 입력해 주세요");return}
   const p=Math.round(s/D.km), row={
-    race:`${$("fYear").value} ${$("fRace").value.trim()}`, course:D.sheet, name:$("fName").value.trim(),
+    date:$("fDate").value, race:`${$("fDate").value.slice(0,4)} ${$("fRace").value.trim().replace(/^\d{4}\s*/,"")}`, course:D.sheet, name:$("fName").value.trim(),
     time:fmtFull(s), pace:String(Math.floor(p/60)*100+p%60), note:$("fNote").value.trim(),
     gender:f.g==="M"?"남":"여", pin
   };
@@ -602,7 +521,7 @@ $("form").addEventListener("submit",async e=>{
     if(!j.ok) throw new Error(j.error||"저장하지 못했어요");
     try{localStorage.setItem("gsrc-hof-pin",pin)}catch(e){}
     const rec=recordOf(f.g,f.d), isCR=!rec||s<rec.s;
-    all.push(...parseRows([[row.race,row.course,row.name,row.time,row.pace,row.note,row.gender]]).map(x=>({...x,order:1e9})));
+    all.push(...parseRows([["날짜","대회","코스","이름","완주 기록","평균페이스","한줄평","성별"],[row.date,row.race,row.course,row.name,row.time,row.pace,row.note,row.gender]]).map(x=>({...x,order:1e9})));
     st.g=f.g; st.d=f.d; st.y="all"; render(); closeForm();
     ["fName","fRace","fH","fM","fS","fNote"].forEach(id=>$(id).value="");
     toast(isCR?`${crown} 크루 신기록 등록! 축하해요`:"기록이 등록됐어요",isCR);
