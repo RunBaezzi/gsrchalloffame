@@ -213,6 +213,35 @@ main{padding:0 16px calc(var(--tab) + var(--sab) + 32px) 10px;min-width:0}
 .toast svg{width:14px;height:14px}.toast.gold{background:var(--acc);color:#111}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 @media (min-width:640px){.sheet .panel{bottom:50%;transform:translateY(calc(50% + 100vh));border-radius:26px;padding-bottom:24px}.sheet.open .panel{transform:translateY(50%)}.grab{display:none}}
+
+/* ── 기록 상세 ── */
+.tap{cursor:pointer}.row.tap:active{background:#1C1C1F}.pd.tap:active .medal{transform:scale(.94)}
+.ph{align-items:flex-start}
+.dhead .dk{font-size:12px;font-weight:600;color:var(--t3)}
+.dhead h2{font-size:24px;font-weight:800;letter-spacing:-.03em;margin-top:2px}
+.dbest{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 10px;margin-top:10px}
+.dbest b{font-family:var(--num);font-size:34px;font-weight:800;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.dbest span{font-size:13px;color:var(--t2);font-family:var(--num)}
+.dbest em{font-style:normal;display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 8px;border-radius:6px;background:var(--acc-soft);color:var(--acc);font-size:11.5px;font-weight:800}
+.dbest em svg{width:11px;height:11px}
+.dlist{background:var(--card);border-radius:16px;overflow:hidden}
+.drow{display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:center;padding:14px 16px;position:relative}
+.drow+.drow{border-top:1px solid var(--line)}
+.dt{font-family:var(--num);font-size:17px;font-weight:700;font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:6px}
+.pb{font-size:10px;font-weight:800;color:var(--t1);background:#2C2C30;border-radius:5px;padding:2px 5px}
+.dm{font-size:12.5px;color:var(--t2);margin-top:3px}
+.dn{font-size:12.5px;color:var(--t3);margin-top:4px;line-height:1.45}
+.del{height:32px;padding:0 12px;border-radius:9px;background:var(--card2);color:var(--t2);font-size:13px;font-weight:600}
+.dconf{grid-column:1/-1;display:none;gap:8px;flex-direction:column}
+.drow.confirm .dconf{display:flex}.drow.confirm .del{visibility:hidden}
+.dconf .in{height:46px;font-size:15px}
+.dbtns{display:grid;grid-template-columns:1fr 1.4fr;gap:8px}
+.dbtns button{height:44px;border-radius:12px;font-size:14px;font-weight:700}
+.cancel{background:var(--card2);color:var(--t2)}
+.kill{background:#E5484D;color:#fff}.kill:disabled{opacity:.5}
+.me{font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;font-size:10.5px;font-weight:700;color:#7CC4FF;background:rgba(124,196,255,.12);border-radius:5px;padding:2px 6px}
+.dq{font-size:13px;color:var(--t2);line-height:1.5;margin:2px 2px 0}
+.dhint{font-size:12px;color:var(--t3);line-height:1.5;margin:12px 4px 4px;text-align:center}
 @media (min-width:640px){
   :root{--rail:112px}
   .hero-title{padding:12px 24px 24px}.hero-title h1{font-size:36px}
@@ -301,12 +330,22 @@ main{padding:0 16px calc(var(--tab) + var(--sab) + 32px) 10px;min-width:0}
     <button type="button" class="pinlink" id="pinShow">비밀번호 다시 입력</button>
   </form>
 </div>
+<div class="sheet" id="detail" aria-hidden="true">
+  <div class="dim" id="detailDim"></div>
+  <div class="panel">
+    <div class="grab"></div>
+    <div class="ph"><div id="dHead" class="dhead"></div><button type="button" class="x" id="dClose" aria-label="닫기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="fl">이 종목 기록</div>
+    <div id="dList" class="dlist"></div>
+    <p class="dhint">이 휴대폰에서 직접 올린 기록은 비밀번호 없이, 그 외 기록은 크루 비밀번호로 지울 수 있어요.</p>
+  </div>
+</div>
 <div class="toast" id="toast" role="status"></div>
 <script>
 /* ============================================================
    ① 구글시트 연결 주소 — Apps Script 배포 후 받은 주소를 따옴표 안에 붙여넣기
    ============================================================ */
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx0l-I2vAWlRNSUT5AkCLzL5BruxyhFyMk9PnoKJtsbMuK9CZ8_5XHFhHc0-n33Ky6c/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxjeA3UDT_suvg6GVz4OaioL1YvYWY0RaDjacggg-vEoHpeLcSE4_LLiORkyGAE45jO/exec";
 
 /* 기록은 모두 구글시트(명예의전당 탭)에서 불러와요. 아래는 비워두세요. */
 const SHEET = `
@@ -331,6 +370,17 @@ const fmtFull = s => `${Math.floor(s/3600)}:${String(Math.floor(s%3600/60)).padS
 const pace = (s,km) => {const p=Math.round(s/km);return `${Math.floor(p/60)}'${String(p%60).padStart(2,"0")}"`};
 const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
+/* 이 기기의 "내 기록 열쇠" — 이 기기에서 올린 기록은 비밀번호 없이 지울 수 있어요 */
+function myKey(){
+  let k=null;try{k=localStorage.getItem("gsrc-hof-key")}catch(e){}
+  if(!k){k=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2))+Math.random().toString(36).slice(2);
+    try{localStorage.setItem("gsrc-hof-key",k)}catch(e){}}
+  return k;
+}
+let myHash="";
+(async()=>{try{const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(myKey()));
+  myHash=[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("").slice(0,16)}catch(e){}})();
+
 /* 시트 줄 → 기록 (머리줄의 칸 이름으로 위치를 찾아요 / DNF·응요·빈 기록·[샘플] 자동 제외) */
 function parseRows(rows){
   rows=(rows||[]).map(c=>(c||[]).map(x=>String(x??"").trim()));
@@ -338,11 +388,11 @@ function parseRows(rows){
   let col;
   if(hi>=0){
     const H=rows[hi], f=p=>H.findIndex(x=>x.startsWith(p));
-    col={date:f("날짜"),course:f("코스"),name:f("이름"),time:f("완주"),note:f("한줄평"),gender:f("성별")};
+    col={date:f("날짜"),course:f("코스"),name:f("이름"),time:f("완주"),note:f("한줄평"),gender:f("성별"),owner:f("등록자")};
     col.race=H.findIndex(x=>x.includes("대회")); if(col.race<0) col.race=col.course-1;
     rows=rows.slice(hi+1);
   }else{ // 예전 형식: 대회|코스|이름|기록|(페이스)|(한줄평)|성별
-    col={date:-1,race:0,course:1,name:2,time:3,note:5,gender:-2};
+    col={date:-1,race:0,course:1,name:2,time:3,note:5,gender:-2,owner:-1};
   }
   const g=(c,i)=>i===-2?c[c.length-1]:(i>=0?(c[i]||""):"");
   return rows.map((c,i)=>{
@@ -355,7 +405,7 @@ function parseRows(rows){
     const s=sec(tm); if(!s) return null;
     const y=(race.match(/^(\d{4})/)||date.match(/^(\d{4})/)||[])[1]||"기타";
     const md=(date.match(/^\d{4}[-./]\s*(\d{1,2})[-./]\s*(\d{1,2})/)||[]);
-    return {race,raceShort:race.replace(/^\d{4}\s*/,""),name,dist:d,gender:gg,s,y,note,
+    return {race,raceShort:race.replace(/^\d{4}\s*/,""),name,dist:d,gender:gg,s,y,note,dateRaw:date,courseRaw:course,owner:g(c,col.owner),
       md:md.length?`${md[1].padStart(2,"0")}.${md[2].padStart(2,"0")}`:"",order:i};
   }).filter(Boolean);
 }
@@ -409,7 +459,7 @@ function render(){
     const slot=(r,pos)=>{
       if(!r) return `<div class="pd p${pos} empty-slot"></div>`;
       const g=Math.min(r.rank,3);
-      return `<div class="pd p${pos} g${g}">
+      return `<div class="pd p${pos} g${g} tap" data-name="${esc(r.name)}">
         ${isRec(r)?`<span class="crtag">${crown}${isAll?"깨지지 않은 기록":"크루 기록"}</span>`:""}
         <div class="medal">${r.rank}</div>
         <div class="pn">${esc(r.name)}</div>
@@ -423,7 +473,7 @@ function render(){
     // 4위부터 목록
     const rest=rank.slice(3), LIMIT=7, shown=st.expanded?rest:rest.slice(0,LIMIT);
     if(rest.length){
-      h+=`<div class="list" style="margin-top:12px">`+shown.map(r=>`<div class="row">
+      h+=`<div class="list" style="margin-top:12px">`+shown.map(r=>`<div class="row tap" data-name="${esc(r.name)}">
           <div class="rank">${r.rank}</div>
           <div class="who"><div class="n">${esc(r.name)}${isRec(r)?'<span class="cr">CR</span>':""}</div><div class="s">${esc(isAll?r.race:r.raceShort)}${r.md?" · "+r.md:""}</div></div>
           <div class="res"><div class="t">${fmt(r.s)}</div><div class="p">${pace(r.s,D.km)}/km</div></div>
@@ -440,6 +490,7 @@ function render(){
   $("main").classList.remove("fade");void $("main").offsetWidth;$("main").classList.add("fade");
   const more=$("more"); if(more) more.onclick=()=>{st.expanded=!st.expanded;render()};
   const ea=$("emptyAdd"); if(ea) ea.onclick=()=>openForm();
+  $("main").querySelectorAll(".tap").forEach(el=>el.onclick=()=>openDetail(el.dataset.name));
 }
 
 $("seg").addEventListener("click",e=>{const b=e.target.closest("button");if(b&&b.dataset.g!==st.g){st.g=b.dataset.g;st.expanded=false;render()}});
@@ -512,7 +563,7 @@ $("form").addEventListener("submit",async e=>{
   const p=Math.round(s/D.km), row={
     date:$("fDate").value, race:`${$("fDate").value.slice(0,4)} ${$("fRace").value.trim().replace(/^\d{4}\s*/,"")}`, course:D.sheet, name:$("fName").value.trim(),
     time:fmtFull(s), pace:String(Math.floor(p/60)*100+p%60), note:$("fNote").value.trim(),
-    gender:f.g==="M"?"남":"여", pin
+    gender:f.g==="M"?"남":"여", pin, key:myKey()
   };
   if(!SCRIPT_URL){toast("아직 구글시트가 연결되지 않았어요");return}
   const btn=$("fSubmit"); btn.disabled=true; btn.textContent="저장 중…";
@@ -521,7 +572,7 @@ $("form").addEventListener("submit",async e=>{
     if(!j.ok) throw new Error(j.error||"저장하지 못했어요");
     try{localStorage.setItem("gsrc-hof-pin",pin)}catch(e){}
     const rec=recordOf(f.g,f.d), isCR=!rec||s<rec.s;
-    all.push(...parseRows([["날짜","대회","코스","이름","완주 기록","평균페이스","한줄평","성별"],[row.date,row.race,row.course,row.name,row.time,row.pace,row.note,row.gender]]).map(x=>({...x,order:1e9})));
+    all.push(...parseRows([["날짜","대회","코스","이름","완주 기록","평균페이스","한줄평","성별","등록자"],[row.date,row.race,row.course,row.name,row.time,row.pace,row.note,row.gender,myHash]]).map(x=>({...x,order:1e9})));
     st.g=f.g; st.d=f.d; st.y="all"; render(); closeForm();
     ["fName","fRace","fH","fM","fS","fNote"].forEach(id=>$(id).value="");
     toast(isCR?`${crown} 크루 신기록 등록! 축하해요`:"기록이 등록됐어요",isCR);
@@ -531,7 +582,58 @@ $("form").addEventListener("submit",async e=>{
     toast(esc(err.message||"저장하지 못했어요. 잠시 후 다시 시도해 주세요"));
   }finally{btn.textContent="기록 등록하기";syncForm()}
 });
-addEventListener("keydown",e=>{if(e.key==="Escape")closeForm()});
+
+/* ── 기록 상세 + 삭제 ── */
+let dName=null;
+function openDetail(name){
+  dName=name; renderDetail();
+  $("detail").classList.add("open"); document.body.style.overflow="hidden";
+}
+function closeDetail(){$("detail").classList.remove("open");document.body.style.overflow=""}
+function renderDetail(){
+  const D=DIST[st.d];
+  const list=all.filter(r=>r.name===dName&&r.gender===st.g&&r.dist===st.d).sort(byTime);
+  if(!list.length){closeDetail();return}
+  const rec=recordOf(st.g,st.d);
+  $("dHead").innerHTML=`<div class="dk">${G[st.g]} ${D.ko}</div><h2>${esc(dName)}</h2>
+    <div class="dbest"><b>${fmt(list[0].s)}</b><span>개인 최고 · ${pace(list[0].s,D.km)}/km</span>${rec&&rec.s===list[0].s?`<em>${crown}크루 기록</em>`:""}</div>`;
+  const isMine=r=>!!(myHash&&r.owner&&r.owner===myHash);
+  $("dList").innerHTML=list.map((r,i)=>{const mine=isMine(r);return `<div class="drow${mine?" mine":""}" data-i="${i}">
+      <div class="dl"><div class="dt">${fmt(r.s)}${i===0?'<span class="pb">PB</span>':""}${mine?'<span class="me">내 기록</span>':""}</div>
+        <div class="dm">${esc(r.race)}${r.md?" · "+r.md:""}</div>${r.note?`<div class="dn">“${esc(r.note)}”</div>`:""}</div>
+      <button class="del">삭제</button>
+      <div class="dconf">${mine?'<p class="dq">이 기록을 삭제할까요? 되돌릴 수 없어요.</p>':'<p class="dq">크루 비밀번호를 입력하면 삭제돼요. 되돌릴 수 없어요.</p><input class="in" type="password" placeholder="크루 비밀번호" maxlength="30">'}
+        <div class="dbtns"><button class="cancel">취소</button><button class="kill">삭제하기</button></div></div>
+    </div>`}).join("");
+  let pin="";try{pin=localStorage.getItem("gsrc-hof-pin")||""}catch(e){}
+  $("dList").querySelectorAll(".drow").forEach(row=>{
+    const r=list[+row.dataset.i], inp=row.querySelector("input");
+    if(inp&&pin){inp.value=pin;inp.hidden=true;row.querySelector(".dq").textContent="이 기록을 삭제할까요? 되돌릴 수 없어요."}
+    row.querySelector(".del").onclick=()=>{ $("dList").querySelectorAll(".drow.confirm").forEach(x=>x.classList.remove("confirm")); row.classList.add("confirm"); if(inp&&!inp.hidden) inp.focus(); };
+    row.querySelector(".cancel").onclick=()=>row.classList.remove("confirm");
+    row.querySelector(".kill").onclick=()=>delRecord(r,inp,row,isMine(r));
+  });
+}
+async function delRecord(r,inp,row,mine){
+  const adminPin=inp?inp.value.trim():"";
+  if(!mine&&!adminPin){inp.hidden=false;inp.focus();toast("크루 비밀번호를 입력해 주세요");return}
+  if(!SCRIPT_URL){toast("아직 구글시트가 연결되지 않았어요");return}
+  const btn=row.querySelector(".kill"); btn.disabled=true; btn.textContent="삭제 중…";
+  try{
+    const res=await fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify({action:"delete",...(mine?{key:myKey()}:{adminPin}),
+      rec:{date:r.dateRaw,race:r.race,course:r.courseRaw,name:r.name,time:fmtFull(r.s)}})});
+    const j=await res.json();
+    if(!j.ok) throw new Error(j.error||"삭제하지 못했어요");
+    if(!mine) try{localStorage.setItem("gsrc-hof-pin",adminPin)}catch(e){}
+    all=all.filter(x=>x!==r); render(); renderDetail(); toast("기록을 삭제했어요"); loadSheet();
+  }catch(err){
+    if(inp&&/비밀번호/.test(err.message)){try{localStorage.removeItem("gsrc-hof-pin")}catch(e){} inp.hidden=false; inp.value=""; inp.focus()}
+    toast(esc(err.message||"삭제하지 못했어요")); btn.disabled=false; btn.textContent="삭제하기";
+  }
+}
+$("detailDim").onclick=closeDetail;
+$("dClose").onclick=closeDetail;
+addEventListener("keydown",e=>{if(e.key==="Escape"){closeForm();closeDetail()}});
 
 render();
 loadSheet();
